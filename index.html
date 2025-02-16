@@ -1,4 +1,345 @@
-<script>
-alert("网站建设中！");
-window.location.href = "creativestar/index.html";
-</script>
+<!DOCTYPE html> 
+<html lang="zh-CN"> 
+ 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>PINKWIN - 天然蚕丝女装</title> 
+    <link rel="icon" href="/logo.png" type="image/png"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">  
+    <style> 
+        :root { 
+            --primary-pink: #FFE6EB; 
+            --silk-white: #F5F0E6; 
+            --deep-gray: #2C2C2C; 
+            --accent-gold: #C5A880; 
+        } 
+ 
+        /* 基础样式 */ 
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; 
+        } 
+ 
+        body { 
+            background-color: var(--silk-white); 
+            overflow-x: hidden; 
+        } 
+ 
+        /* 顶部导航栏 */ 
+      .top-nav { 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            height: 70px; 
+            background: rgba(255, 255, 255, 0.95); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 5%; 
+            z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+        } 
+ 
+      .menu-icon { 
+            font-size: 24px; 
+            cursor: pointer; 
+            transition: transform 0.3s ease; 
+        } 
+ 
+      .menu-icon:hover { 
+            color: var(--accent-gold); 
+            transform: rotate(90deg); 
+        } 
+ 
+      .nav-items { 
+            display: flex; 
+            margin-left: 40px; 
+            gap: 30px; 
+        } 
+ 
+      .nav-item { 
+            color: var(--deep-gray); 
+            text-decoration: none; 
+            font-weight: 500; 
+            position: relative; 
+        } 
+ 
+      .nav-item::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -5px; 
+            left: 0; 
+            width: 0; 
+            height: 2px; 
+            background: var(--accent-gold); 
+            transition: width 0.3s; 
+        } 
+ 
+      .nav-item:hover::after { 
+            width: 100%; 
+        } 
+ 
+        /* 侧边栏 */ 
+      .sidebar { 
+            position: fixed; 
+            left: -300px; 
+            top: 70px; 
+            width: 300px; 
+            height: calc(100vh - 70px); 
+            background: var(--primary-pink); 
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 20px; 
+            z-index: 999; 
+        } 
+ 
+      .sidebar.active  { 
+            left: 0; 
+        } 
+ 
+      .sidebar-link { 
+            display: block; 
+            padding: 15px; 
+            margin: 10px 0; 
+            color: var(--deep-gray); 
+            text-decoration: none; 
+            border-radius: 8px; 
+            transition: all 0.3s; 
+        } 
+ 
+      .sidebar-link:hover { 
+            background: rgba(255, 255, 255, 0.3); 
+            transform: translateX(10px); 
+        } 
+ 
+        /* 主视觉区 */ 
+      .hero { 
+            height: 100vh; 
+            background: linear-gradient(rgba(255, 230, 235, 0.9), rgba(245, 240, 230, 0.9)), 
+                url('silk-texture.jpg');  
+            background-size: cover; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            padding-top: 70px; 
+        } 
+ 
+      .hero h1 { 
+            font-size: 3.5em; 
+            color: var(--deep-gray); 
+            margin-bottom: 20px; 
+            animation: fadeInUp 1s ease; 
+        } 
+ 
+        /* 产品卡片新版样式 */ 
+      .product-card { 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+            transition: transform 0.3s; 
+            display: flex; 
+            cursor: pointer; 
+            position: relative; 
+            text-decoration: none!important; 
+            width: 360px; 
+            height: 180px; 
+        } 
+ 
+      .product-card:hover { 
+            transform: translateY(-10px); 
+        } 
+ 
+      .product-card img { 
+            width: 80px; 
+            height: 80px; 
+            object-fit: cover; 
+            flex-shrink: 0; 
+            border-radius: 10px 0 0 10px; 
+        } 
+ 
+      .product-info { 
+            padding: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            flex-grow: 1; 
+        } 
+ 
+      .product-info h5 { 
+            color: var(--deep-gray); 
+            font-size: 1.2em; 
+            margin-bottom: 8px; 
+        } 
+ 
+      .product-info p { 
+            color: #666; 
+            line-height: 1.6; 
+            font-size: 0.9em; 
+        } 
+ 
+      .logo { 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -o-user-select: none; 
+            user-select: none; 
+        } 
+ 
+        button { 
+            background-color: #f66f6a; 
+            color: white; 
+            width: 300px; 
+            height: 40px; 
+            border: 0; 
+            font-size: 16px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        } 
+ 
+        button:hover { 
+            background-color: #a54b4a; 
+        } 
+ 
+      .items { 
+            padding: 50px 5%; 
+        } 
+ 
+      .items h3 { 
+            font-size: 2em; 
+            color: var(--deep-gray); 
+            margin-bottom: 30px; 
+            text-align: center; 
+        } 
+
+      br {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+      }
+
+     a {
+            text-decoration: none;
+            color: black;
+     }
+ 
+        /* 动画定义 */ 
+        @keyframes fadeInUp { 
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            } 
+ 
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            } 
+        } 
+ 
+        /* 响应式设计 */ 
+        @media (max-width: 768px) { 
+          .nav-items { 
+                display: none; 
+            } 
+ 
+          .sidebar { 
+                width: 100%; 
+                left: -100%; 
+            } 
+ 
+          .product-card { 
+                flex-direction: column; 
+            } 
+ 
+          .product-card img { 
+                width: 100%; 
+                height: auto; 
+                aspect-ratio: 1/1; 
+                border-radius: 10px 10px 0 0; 
+            } 
+        } 
+    </style> 
+    <script>
+        function taobao(){
+            // 跳转至淘宝
+            window.location.href = "https://shop58144255.taobao.com/";
+        }
+    </script>
+</head> 
+ 
+<body> 
+    <!-- 顶部导航 --> 
+    <nav class="top-nav"> 
+        <i class="menu-icon fas fa-bars"></i> 
+        <div class="tab"> 
+            <p>&emsp;</p> 
+        </div> 
+        <a href="#" style=""> 
+            <div class="logo" style="gap: 30px">
+                 <img src="/logo.png"></img>
+            </div> 
+        </a> 
+        <div class="nav-items"> 
+            <a href="/index.html#"  class="nav-item">首页</a> 
+            <a href="/services.html"  class="nav-item">服务</a> 
+            <a href="/news/all.html"  class="nav-item">公司新闻</a> 
+            <a href="/description.html"  class="nav-item">介绍</a> 
+        </div> 
+    </nav> 
+ 
+        <!-- 侧边栏 --> 
+    <aside class="sidebar"> 
+        <a href="/creativestar/class/index.html"  class="sidebar-link"> 
+            <i class="fas fa-star"></i> 去创星中队 
+        </a> 
+        <a href="/creativestar/index.html"  class="sidebar-link"> 
+            <i class="fas fa-palette"></i> 创星工作室 
+        </a> 
+    </aside> 
+ 
+    <!-- 主视觉区 --> 
+    <section class="hero"> 
+        <div class="hero-content"> 
+            <h1>天然蚕丝，定义优雅</h1> 
+            <p class="subtitle">PINKWIN 2025春季系列——轻盈如丝，风华自成</p><br /><br /> 
+            <button class="cta-btn" onclick="taobao()">探索新品</button> 
+        </div> 
+    </section> 
+ 
+    <div class="items"> 
+        <h3>我们的产品</h3> 
+        <!-- 产品展示 --> 
+        <section class="product-grid"> 
+            <a href="https://shop58144255.taobao.com/"  class="product-card"> 
+                <img src="/all.jpg"  alt="全部商品"> 
+                <div class="product-info"> 
+                    <h5>全部可售卖商品</h5> 
+                    <p>精选蚕丝、羊绒女装，融合现代设计与传统工艺，点击查看所有在售商品</p> 
+                </div> 
+            </a> 
+        </section> 
+    </div> 
+ 
+    <script> 
+        // 侧边栏切换 
+        document.querySelector('.menu-icon').addEventListener('click',  () => { 
+            document.querySelector('.sidebar').classList.toggle('active');  
+        }); 
+ 
+        // 滚动动画 
+        window.addEventListener('scroll',  () => { 
+            const elements = document.querySelectorAll('.product-card');  
+            elements.forEach(el  => { 
+                const rect = el.getBoundingClientRect();  
+                if (rect.top  < window.innerHeight  * 0.8) { 
+                    el.style.opacity  = '1'; 
+                    el.style.transform  = 'translateY(0)'; 
+                } 
+            }); 
+        }); 
+    </script> 
+</body> 
+ 
+</html> 
