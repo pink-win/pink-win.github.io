@@ -19,6 +19,8 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            
+
         }
 
         body {
@@ -63,6 +65,8 @@
             font-weight: 500;
             position: relative;
         }
+      
+        
 
         .nav-item::after {
             content: '';
@@ -148,8 +152,58 @@
         }
 
         .product-card:hover {
-            transform: translateY(-10px);
+           transform: translateY(-10px);
         }
+      
+        .logo {
+				-webkit-user-select: none;
+           -moz-user-select: none;
+           -o-user-select: none;
+           user-select: none;
+        }
+      
+      	 .nav-item {
+       
+			  -webkit-user-select: none;
+          -moz-user-select: none;
+          -o-user-select: none;
+          user-select: none;
+       
+      	 }
+      
+       .t {
+				-webkit-user-select: none;
+           -moz-user-select: none;
+           -o-user-select: none;
+           user-select: none;
+        }
+      
+        button {
+				background-color: #f66f6a;
+				color: white;
+				width: 400px;
+				height: 45px;
+				border: 0;
+				font-size: 16px;
+				border-radius: 5px;
+			}
+
+        button:hover {
+        	background-color: #a54b4a;
+        }
+      
+        a {
+  				text-decoration: none;
+           color: black;
+			}
+      
+        br {
+				-webkit-user-select: none;
+           -moz-user-select: none;
+           -o-user-select: none;
+           user-select: none;
+        }
+        
 
         /* 动画定义 */
         @keyframes fadeInUp {
@@ -179,13 +233,22 @@
     <!-- 顶部导航 -->
     <nav class="top-nav">
         <i class="menu-icon fas fa-bars"></i>
+      <div class="tab">
+      		<p>
+        		&emsp;
+      		</p>
+      </div>
+      
+      <a href="#" style="">
+        <div class="logo" style="gap: 30px">PINKWIN</div>
+      </a>
         <div class="nav-items">
             <a href="/index.html#" class="nav-item">首页</a>
             <a href="/services.html" class="nav-item">服务</a>
             <a href="/news/all.html" class="nav-item">公司新闻</a>
             <a href="/description.html" class="nav-item">介绍</a>
         </div>
-        <div class="logo">PINKWIN</div>
+        
     </nav>
 
     <!-- 侧边栏 -->
@@ -202,21 +265,28 @@
     <section class="hero">
         <div class="hero-content">
             <h1>天然蚕丝，定义优雅</h1>
-            <p class="subtitle">PINKWIN 2024秋季系列——轻盈如丝，风华自成</p>
-            <button class="cta-btn">探索新品</button>
+            <p class="subtitle">PINKWIN 2025春季系列——轻盈如丝，风华自成</p><br><br>
+            <button class="cta-btn" href="#">探索新品</button>
         </div>
     </section>
 
     <!-- 产品展示 -->
     <section class="product-grid">
         <!-- 产品卡片循环区域 -->
-        <div class="product-card">
+      <h3>我们的产品</h3><br>
+      <p>Loading...</p>
+        <!-- 注释，实际应替换 -->
+        <style>
+          /*
+          <div class="product-card">
             <img src="product1.jpg" alt="蚕丝女装">
             <div class="product-info">
                 <h3>桑蚕丝连衣裙</h3>
                 <p>100%天然桑蚕丝</p>
             </div>
-        </div>
+          </div>
+          /*
+      </style>
         <!-- 更多产品卡片... -->
     </section>
 
