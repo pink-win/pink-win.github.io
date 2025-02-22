@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>豆包AI聊天室</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+       .chat-container {
+            max-width: 800px;
+            height: 90vh;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+       .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+       .message {
+            margin: 10px 0;
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 70%;
+            animation: fadeIn 0.3s ease;
+            white-space: normal;
+            line-height: 1.5;
+            word-break: break-word; 
+        }
+
+       .user-message {
+            background: #4a90e2;
+            color: white;
+            margin-left: auto;
+        }
+
+       .ai-message {
+            background: #f0f4f8;
+            margin-right: auto;
+        }
+
+       .input-area {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+       .menu-icon {
+            cursor: pointer;
+            font-size: 24px;
+            color: #4a90e2;
+        }
+
+       .menu {
+            position: absolute;
+            right: 20px;
+            bottom: 80px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            width: 250px;
+        }
+
+       .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+       .ds-content {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+
+       .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 深度思考样式 */
+      .ds-content.pb-12px  {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 12px;
+        }
+
+      .ds-content.pb-12px.mb-16px  {
+            margin-bottom: 16px;
+        }
+
+      .ds-content.pb-12px.inline-flex  {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 10px;
+            padding-left: 10px;
+            padding-right: 16px;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            position: relative;
+            background: #f0f4f8;
+            transition: background 0.2s;
+        }
+
+      .ai-message, .user-message p {
+    	    margin: 6px 0;  /* 控制段落间距 */
+        }
+ 
+      .ai-message, .user-message pre {
+            margin: 8px 0;  /* 代码块间距控制 */
+        }
+
+      .ds-content.pb-12px.inline-flex:hover  {
+            background: #e5e5e5;
+        }
+
+      .ds-content.pb-12px.h-18px  {
+            height: 18px;
+            font-size: 13px;
+            line-height: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+      .ds-content.pb-12px.svg-icon  {
+            width: 18px;
+            height: 18px;
+        }
+
+      .ds-content.pb-12px.ml-6px  {
+            margin-left: 6px;
+        }
+
+      .ds-content.pb-12px.mr-8px  {
+            margin-right: 8px;
+        }
+
+      .ds-content.pb-12px.size-16px  {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.25s;
+        }
+
+      .ds-content.pb-12px.w-full  {
+            width: 100%;
+        }
+
+      .ds-content.pb-12px.text-left  {
+            text-align: left;
+        }
+
+      .ds-content.pb-12px.text-primary-opacity  {
+            color: rgba(51, 51, 51, 0.5);
+        }
+
+      .ds-content.pb-12px.text-opacity-50  {
+            opacity: 0.5;
+        }
+
+      .ds-content.pb-12px.text-14px  {
+            font-size: 14px;
+        }
+
+      .ds-content.pb-12px.leading-22px  {
+            line-height: 22px;
+        }
+
+      .ds-content.pb-12px.pl-18px  {
+            padding-left: 18px;
+        }
+
+      .ds-content.pb-12px.border-left-2px  {
+            border-left: 2px solid #E5E5E5;
+        }
+
+      .ds-content.pb-12px.whitespace-pre-wrap  {
+            white-space: pre-wrap;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script> 
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="和豆包聊点什么吧..." />
+            <div class="menu-icon" onclick="toggleMenu()">☰</div>
+            <button onclick="sendMessage()">发送</button>
+        </div>
+        <div class="menu" id="menu">
+            <div class="menu-item">
+                <label for="sourceSelect">选择源</label>
+                <select id="sourceSelect" onchange="handleSourceChange()">
+                    <option value="official">DeepSeek官方源</option>
+                    <option value="siliconflow">硅基流动源</option>
+                    <option value="chatanywhere">ChatAnyWhere源</option>
+                </select>
+            </div>
+            <div class="menu-item" id="deepThinkingSwitchContainer">
+                <label for="deepThinkingSwitch">深度思考开关</label>
+                <input type="checkbox" id="deepThinkingSwitch">
+            </div>
+            <div class="menu-item" id="contextSwitchContainer">
+                <label for="contextSwitch">上下文开关</label>
+                <input type="checkbox" id="contextSwitch">
+            </div>
+            <div class="menu-item hidden" id="modelSelectContainer">
+                <label for="modelSelect">选择模型</label>
+                <select id="modelSelect" onchange="handleModelChange()">
+                    <option value="deepseek-ai/DeepSeek-R1">DeepSeek-R1</option>
+                    <option value="deepseek-ai/DeepSeek-V3">DeepSeek-V3</option>
+                    <option value="deepseek-ai/DeepSeek-V2.5">DeepSeek-V2.5</option>
+                    <option value="deepseek-ai/DeepSeek-R1-Distill-Llama-70B">DeepSeek-R1-Distill-Llama-70B</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="menu-item hidden" id="customModelContainer">
+                <input type="text" id="customModelInput" placeholder="输入模型名" />
+                <label for="tryDeepThinking">是否尝试深度思考</label>
+                <input type="checkbox" id="tryDeepThinking">
+            </div>
+            <div class="menu-item hidden" id="chatAnywhereModelSelectContainer">
+                <label for="chatAnywhereModelSelect">选择模型</label>
+                <select id="chatAnywhereModelSelect">
+                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                    <option value="embedding">embedding</option>
+                    <option value="gpt-4o-mini">gpt-4o-mini</option>
+                    <option value="gpt-4">gpt-4</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY_OFFICIAL = 'sk-1d46e1e124254fcfae7b6e7b5f88640e'; // DeepSeek官方源 API Key
+        const API_KEY_SILICONFLOW = 'sk-fofduluorzfefiwshdgvisftnsowfvdbsqevcouvqawkuccb'; // 硅基流动源 API Key
+        const API_KEY_CHATANYWHERE = 'sk-uXRc2kYGn3WsKl1Sq4BJnlCIvVXDbWFB7trsV7hbr8vll8Yq'; // ChatAnyWhere源 API Key
+
+        let isDeepThinkingEnabled = false; // 深度思考开关状态
+        let isSiliconFlowSource = false; // 是否使用硅基流动源
+        let isChatAnywhereSource = false; // 是否使用ChatAnyWhere源
+        let selectedModel = 'deepseek-ai/DeepSeek-R1'; // 当前选择的模型
+        let isCustomModel = false; // 是否选择自定义模型
+        let tryDeepThinking = false; // 是否尝试深度思考
+        let isContextEnabled = false; // 上下文开关状态
+        let conversationHistory = []; // 对话历史
+
+        // 切换菜单显示与隐藏
+        function toggleMenu() {
+            const menu = document.getElementById('menu'); 
+            menu.style.display  = menu.style.display  === 'flex'? 'none' : 'flex';
+        }
+
+        // 监听菜单外的点击事件以关闭菜单
+        document.addEventListener('click',  (event) => {
+            const menu = document.getElementById('menu'); 
+            const menuIcon = document.querySelector('.menu-icon'); 
+            if (!menu.contains(event.target)  &&!menuIcon.contains(event.target))  {
+                menu.style.display  = 'none';
+            }
+        });
+
+        // 处理源选择变化
+        function handleSourceChange() {
+            const sourceSelect = document.getElementById('sourceSelect'); 
+            isSiliconFlowSource = sourceSelect.value  === 'siliconflow';
+            isChatAnywhereSource = sourceSelect.value  === 'chatanywhere';
+
+            // 显示或隐藏深度思考开关和模型选择
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden',  isSiliconFlowSource || isChatAnywhereSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource); 
+            document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource  ||!isCustomModel);
+            document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource); // ChatAnyWhere源不显示硅基流动源的模型列表
+        }
+
+        // 处理模型选择变化
+        function handleModelChange() {
+            const modelSelect = document.getElementById('modelSelect'); 
+            selectedModel = modelSelect.value; 
+            isCustomModel = selectedModel === 'custom';
+
+            // 显示或隐藏自定义模型输入框
+            document.getElementById('customModelContainer').classList.toggle('hidden',!isCustomModel); 
+        }
+
+        // 添加消息到聊天窗口
+        function appendMessage(content, isUser = false, reasoningContent = null) {
+            const messagesDiv = document.getElementById('chatMessages'); 
+            const md = window.markdownit(); 
+        
+            // 如果有深度思考内容，先添加深度思考内容
+            if (reasoningContent) {
+                const reasoningDiv = document.createElement('div'); 
+                reasoningDiv.className  = 'ds-content pb-12px flex flex-col';
+                reasoningDiv.innerHTML  = `
+                    <div class="mb-16px">
+                        <div class="inline-flex items-center cursor-pointer rounded-[10px] pl-[10px] pr-[16px] py-[7px] relative hover:bg-gray-nav-hover bg-secondary toggle-reasoning">
+                            <div class="h-18px text-[13px] leading-18px text-primary flex items-center relative">
+                                <div class="ml-6px mr-8px">已深度思考</div>
+                                <div class="size-16px flex items-center justify-center cursor-pointer transition-transform transition-[0.25s] transform ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full flex text-left text-primary-opacity text-opacity-50 text-[14px] leading-[22px] reasoning-content hidden">
+                        <div class="w-full pl-18px border-left-2px whitespace-pre-wrap border-[#E5E5E5]">${reasoningContent}</div>
+                    </div>
+                `;
+                messagesDiv.appendChild(reasoningDiv); 
+        
+                // 添加点击事件以展开或收起深度思考内容
+                const toggleButton = reasoningDiv.querySelector('.toggle-reasoning'); 
+                if (toggleButton) {
+                    toggleButton.addEventListener('click',  function () {
+                        const contentDiv = reasoningDiv.querySelector('.reasoning-content'); 
+                        if (contentDiv) {
+                            contentDiv.classList.toggle('hidden'); 
+                        }
+                    });
+                }
+            }
+        
+            // 添加消息
+            const messageDiv = document.createElement('div'); 
+            messageDiv.className  = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            messageDiv.innerHTML  = md.render(content); 
+            messagesDiv.appendChild(messageDiv); 
+        
+            // 滚动到底部
+            messagesDiv.scrollTop  = messagesDiv.scrollHeight; 
+        
+            // 调试信息
+            console.log(' 消息添加成功:', { content, isUser, reasoningContent });
+        }
+ 
+        
+        // 发送消息
+        async function sendMessage() {
+            const input = document.getElementById('userInput'); 
+            const userMessage = input.value.trim(); 
+            if (!userMessage) return;
+        
+            input.value  = '';
+            appendMessage(userMessage, true);
+        
+            // 更新对话历史
+            if (isContextEnabled) {
+                conversationHistory.push({  role: 'user', content: userMessage });
+            } else {
+                conversationHistory = [{ role: 'user', content: userMessage }];
+            }
+        
+            try {
+                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions'  : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions'; 
+                const apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : API_KEY_OFFICIAL;
+                let model;
+        
+                if (isSiliconFlowSource) {
+                    model = isCustomModel ? document.getElementById('customModelInput').value  : selectedModel;
+                } else if (isChatAnywhereSource) {
+                    model = document.getElementById('chatAnywhereModelSelect').value;
+                } else {
+                    // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型 
+                    model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
+                }
+        
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({ 
+                        model: model,
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        // 添加深度思考参数
+                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && isDeepThinkingEnabled)
+                    })
+                });
+        
+                if (!response.ok)  {
+                    throw new Error(`API 请求失败: ${response.statusText}`); 
+                }
+        
+                const data = await response.json(); 
+                console.log('API  响应:', data); // 调试信息，检查响应结构 
+        
+                // 确保 data.choices  存在且有内容
+                const choices = data.choices  && data.choices.length  > 0 ? data.choices  : [];
+                const aiResponse = choices[0]?.message?.content || '无法获取回复';
+                const reasoningContent = choices[0]?.message?.reasoning_content || null;
+        
+                // 更新对话历史 
+                if (isContextEnabled) {
+                    conversationHistory.push({  role: 'assistant', content: aiResponse });
+                }
+        
+                // 判断是否显示深度思考内容
+                const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && isDeepThinkingEnabled);
+                appendMessage(aiResponse, false, showDeepThinking && reasoningContent ? reasoningContent : null);
+        
+                // 调试信息
+                console.log('AI  回复:', { aiResponse, reasoningContent, showDeepThinking });
+            } catch (error) {
+                appendMessage('服务器繁忙，请稍后再试。（您可尝试切换源）');
+                console.error('API  请求出错:', error);
+            }
+        }
+        // 回车发送
+        document.getElementById('userInput').addEventListener('keypress',  (e) => {
+            if (e.key  === 'Enter') sendMessage();
+        });
+
+        // 上下文开关处理
+        document.getElementById('contextSwitch').addEventListener('change',  (e) => {
+            isContextEnabled = e.target.checked; 
+        });
+
+        // 深度思考开关处理
+        document.getElementById('deepThinkingSwitch').addEventListener('change',  (e) => {
+            isDeepThinkingEnabled = e.target.checked; 
+        });
+
+        // 尝试深度思考开关处理
+        document.getElementById('tryDeepThinking').addEventListener('change',  (e) => {
+            tryDeepThinking = e.target.checked; 
+        });
+    </script>
+</body>
+
+</html>
