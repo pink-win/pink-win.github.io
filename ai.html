@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>豆包AI聊天室</title>
+    <title>AI模型大杂烩</title>
     <style>
         body {
             font-family: 'Segoe UI', system-ui;
@@ -38,7 +38,7 @@
             border-radius: 15px;
             max-width: 70%;
             animation: fadeIn 0.3s ease;
-            white-space: normal;
+            white-space: pre-wrap; /* 修改为 pre-wrap 以支持换行 */
             line-height: 1.5;
             word-break: break-word; 
         }
@@ -47,11 +47,13 @@
             background: #4a90e2;
             color: white;
             margin-left: auto;
+            white-space: pre-wrap;
         }
 
        .ai-message {
             background: #f0f4f8;
             margin-right: auto;
+            white-space: pre-wrap;
         }
 
        .input-area {
@@ -247,7 +249,7 @@
     <div class="chat-container">
         <div class="chat-messages" id="chatMessages"></div>
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="和豆包聊点什么吧..." />
+            <textarea id="userInput" placeholder="和AI聊点什么吧..." rows="3" style="width: 82.5%; resize: none;"></textarea> <!-- 修改为 textarea 并增加宽度样式，并设置为不可手动更改大小 -->
             <div class="menu-icon" onclick="toggleMenu()">☰</div>
             <button onclick="sendMessage()">发送</button>
         </div>
@@ -261,7 +263,7 @@
                 </select>
             </div>
             <div class="menu-item" id="deepThinkingSwitchContainer">
-                <label for="deepThinkingSwitch">深度思考开关</label>
+                <label for="deepThinkingSwitch">深度思考开关（R1）</label>
                 <input type="checkbox" id="deepThinkingSwitch">
             </div>
             <div class="menu-item" id="contextSwitchContainer">
@@ -279,7 +281,7 @@
                 </select>
             </div>
             <div class="menu-item hidden" id="customModelContainer">
-                <input type="text" id="customModelInput" placeholder="输入模型名" />
+                <input type="text" id="customModelInput" placeholder="输入硅基流动模型分类/名称" />
                 <label for="tryDeepThinking">是否尝试深度思考</label>
                 <input type="checkbox" id="tryDeepThinking">
             </div>
@@ -287,9 +289,8 @@
                 <label for="chatAnywhereModelSelect">选择模型</label>
                 <select id="chatAnywhereModelSelect">
                     <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                    <option value="embedding">embedding</option>
                     <option value="gpt-4o-mini">gpt-4o-mini</option>
-                    <option value="gpt-4">gpt-4</option>
+                    <option value="gpt-4">gpt-4（每天限用3次，先到先得！）</option>
                 </select>
             </div>
         </div>
@@ -335,7 +336,7 @@
             document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource); 
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource  ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource); // ChatAnyWhere源不显示硅基流动源的模型列表
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || sourceSelect.value === 'official'); // ChatAnyWhere源不显示硅基流动源的模型列表，官方源不显示模型下拉栏
         }
 
         // 处理模型选择变化
@@ -474,7 +475,10 @@
         }
         // 回车发送
         document.getElementById('userInput').addEventListener('keypress',  (e) => {
-            if (e.key  === 'Enter') sendMessage();
+            if (e.key  === 'Enter' && !e.ctrlKey) {
+                e.preventDefault(); // 阻止默认行为
+                sendMessage();
+            }
         });
 
         // 上下文开关处理
