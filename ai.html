@@ -260,6 +260,7 @@
                     <option value="official">DeepSeek官方源</option>
                     <option value="siliconflow">硅基流动源</option>
                     <option value="chatanywhere">ChatAnyWhere源</option>
+                    <option value="moonshot">MoonShot官方源</option>
                 </select>
             </div>
             <div class="menu-item" id="deepThinkingSwitchContainer">
@@ -293,6 +294,16 @@
                     <option value="gpt-4">gpt-4（每天限用3次，先到先得！）</option>
                 </select>
             </div>
+            <div class="menu-item hidden" id="moonshotModelSelectContainer">
+                <label for="moonshotModelSelect">选择模型</label>
+                <select id="moonshotModelSelect">
+                    <option value="moonshot-v1-128k">moonshot-v1-128k（kimi）</option>
+                </select>
+            </div>
+            <div class="menu-item hidden" id="moonshotWebSearchContainer">
+                <label for="moonshotWebSearch">联网搜索开关</label>
+                <input type="checkbox" id="moonshotWebSearch">
+            </div>
         </div>
     </div>
 
@@ -300,14 +311,17 @@
         const API_KEY_OFFICIAL = 'sk-1d46e1e124254fcfae7b6e7b5f88640e'; // DeepSeek官方源 API Key
         const API_KEY_SILICONFLOW = 'sk-fofduluorzfefiwshdgvisftnsowfvdbsqevcouvqawkuccb'; // 硅基流动源 API Key
         const API_KEY_CHATANYWHERE = 'sk-uXRc2kYGn3WsKl1Sq4BJnlCIvVXDbWFB7trsV7hbr8vll8Yq'; // ChatAnyWhere源 API Key
+        const API_KEY_MOONSHOT = 'sk-NwoLTWpGto7m8myq1svIUHBuIeh3m6tDAtHepZu0x3A3wG0h'; // MoonShot官方源 API Key
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
         let isChatAnywhereSource = false; // 是否使用ChatAnyWhere源
+        let isMoonShotSource = false; // 是否使用MoonShot官方源
         let selectedModel = 'deepseek-ai/DeepSeek-R1'; // 当前选择的模型
         let isCustomModel = false; // 是否选择自定义模型
         let tryDeepThinking = false; // 是否尝试深度思考
         let isContextEnabled = false; // 上下文开关状态
+        let isMoonshotWebSearchEnabled = false; // Moonshot联网搜索开关状态
         let conversationHistory = []; // 对话历史
 
         // 切换菜单显示与隐藏
@@ -330,13 +344,16 @@
             const sourceSelect = document.getElementById('sourceSelect'); 
             isSiliconFlowSource = sourceSelect.value  === 'siliconflow';
             isChatAnywhereSource = sourceSelect.value  === 'chatanywhere';
+            isMoonShotSource = sourceSelect.value === 'moonshot';
 
             // 显示或隐藏深度思考开关和模型选择
-            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden',  isSiliconFlowSource || isChatAnywhereSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource); 
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden',  isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource); 
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource  ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || sourceSelect.value === 'official'); // ChatAnyWhere源不显示硅基流动源的模型列表，官方源不显示模型下拉栏
+            document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
+            document.getElementById('moonshotWebSearchContainer').classList.toggle('hidden',!isMoonShotSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || sourceSelect.value === 'official'); // ChatAnyWhere源和MoonShot源不显示硅基流动源的模型列表，官方源不显示模型下拉栏
         }
 
         // 处理模型选择变化
@@ -417,19 +434,30 @@
             }
         
             try {
-                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions'  : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions'; 
-                const apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : API_KEY_OFFICIAL;
+                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions'  : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions'; 
+                const apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : isMoonShotSource ? API_KEY_MOONSHOT : API_KEY_OFFICIAL;
                 let model;
         
                 if (isSiliconFlowSource) {
                     model = isCustomModel ? document.getElementById('customModelInput').value  : selectedModel;
                 } else if (isChatAnywhereSource) {
                     model = document.getElementById('chatAnywhereModelSelect').value;
+                } else if (isMoonShotSource) {
+                    model = document.getElementById('moonshotModelSelect').value;
                 } else {
                     // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型 
                     model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
                 }
-        
+
+                const tools = isMoonShotSource && isMoonshotWebSearchEnabled ? [
+                    {
+                        "type": "builtin_function",
+                        "function": {
+                            "name": "$web_search",
+                        },
+                    }
+                ] : [];
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -440,8 +468,9 @@
                         model: model,
                         messages: conversationHistory,
                         temperature: 0.7,
+                        tools: tools,  // 添加 tools 参数
                         // 添加深度思考参数
-                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && isDeepThinkingEnabled)
+                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled)
                     })
                 });
         
@@ -463,7 +492,7 @@
                 }
         
                 // 判断是否显示深度思考内容
-                const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && isDeepThinkingEnabled);
+                const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled);
                 appendMessage(aiResponse, false, showDeepThinking && reasoningContent ? reasoningContent : null);
         
                 // 调试信息
@@ -494,6 +523,11 @@
         // 尝试深度思考开关处理
         document.getElementById('tryDeepThinking').addEventListener('change',  (e) => {
             tryDeepThinking = e.target.checked; 
+        });
+
+        // Moonshot联网搜索开关处理
+        document.getElementById('moonshotWebSearch').addEventListener('change',  (e) => {
+            isMoonshotWebSearchEnabled = e.target.checked; 
         });
     </script>
 </body>
