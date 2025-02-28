@@ -274,13 +274,13 @@
 
         // 解密API密钥
         const API_KEY_OFFICIAL = decodeApiKey(API_KEY_OFFICIAL_ENCODED);
-        console.log(API_KEY_OFFICIAL)
+        // console.log(API_KEY_OFFICIAL)
         const API_KEY_SILICONFLOW = decodeApiKey(API_KEY_SILICONFLOW_ENCODED);
-        console.log(API_KEY_SILICONFLOW)
+        // console.log(API_KEY_SILICONFLOW)
         const API_KEY_CHATANYWHERE = decodeApiKey(API_KEY_CHATANYWHERE_ENCODED);
-        console.log(API_KEY_CHATANYWHERE)
+        // console.log(API_KEY_CHATANYWHERE)
         const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
-        console.log(API_KEY_MOONSHOT)   
+        // console.log(API_KEY_MOONSHOT)   
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
@@ -298,24 +298,13 @@
         fetch('sensitive-words/sensitive-words.wlist')
             .then(response => response.text())
             .then(data => {
-                // Base64解密
-                const binaryString = window.atob(data);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
+                const decodedData = window.decodeURIComponent(window.atob(data)); // Base64解密
+                // 使用正则表达式分割换行符，处理不同类型的换行符
+                sensitiveWords = decodedData.split(/\r?\n/) // 处理 \n 和 \r\n
+                    .map(word => word.trim()) // 去掉每行的前后空格
+                    .filter(word => word.length > 0); // 过滤掉空行
 
-                // 使用 TextDecoder 解码为 UTF-8
-                const decodedData = new TextDecoder('utf-8').decode(bytes);
-                
-                // 处理敏感词
-                sensitiveWords = decodedData.split(/\r?\n/) // 处理换行符
-                    .map(word => word.trim()) // 去掉前后空格
-                    .filter(word => word.length > 0); // 过滤空行
-
-                console.log(sensitiveWords); // 调试输出
+                console.log(sensitiveWords); // 调试输出，查看敏感词列表
             });
 
         // 切换菜单显示与隐藏
