@@ -448,7 +448,7 @@
                 const requestBody = {
                     model: model,
                     messages: [
-                        { role: 'system', content: '你需要遵循特殊的markdown语法，此语法添加了彩色字支持，用法示例："§RGB代码（例如00ff11）§彩色文字§clear§黑色文字"，如果要显示§，则用\\§' },
+                        { role: 'system', content: '你需要遵循特殊的markdown语法，此语法添加了彩色字支持，用法示例："§RGB代码（例如#00ff11）§彩色文字§clear§黑色文字"，如果要显示§，则用\\§' },
                         ...conversationHistory
                     ],
                     temperature: 0.7,
