@@ -38,22 +38,20 @@
             border-radius: 15px;
             max-width: 70%;
             animation: fadeIn 0.3s ease;
-            white-space: pre-wrap; /* 修改为 pre-wrap 以支持换行 */
+            white-space: pre-wrap;
             line-height: 1.5;
-            word-break: break-word; 
+            word-break: break-word;
         }
 
        .user-message {
             background: #4a90e2;
             color: white;
             margin-left: auto;
-            white-space: pre-wrap;
         }
 
        .ai-message {
             background: #f0f4f8;
             margin-right: auto;
-            white-space: pre-wrap;
         }
 
        .input-area {
@@ -64,7 +62,8 @@
             align-items: center;
         }
 
-        input {
+        input,
+        textarea {
             flex: 1;
             padding: 12px;
             border: 1px solid #ddd;
@@ -136,120 +135,57 @@
             }
         }
 
-        /* 深度思考样式 */
-      .ds-content.pb-12px  {
+       .ds-content.reasoning {
             display: flex;
             flex-direction: column;
             padding-bottom: 12px;
         }
 
-      .ds-content.pb-12px.mb-16px  {
-            margin-bottom: 16px;
-        }
-
-      .ds-content.pb-12px.inline-flex  {
+       .ds-content.reasoning-toggle {
             display: inline-flex;
             align-items: center;
             cursor: pointer;
             border-radius: 10px;
-            padding-left: 10px;
-            padding-right: 16px;
-            padding-top: 7px;
-            padding-bottom: 7px;
-            position: relative;
+            padding: 7px 16px 7px 10px;
             background: #f0f4f8;
             transition: background 0.2s;
         }
 
-      .ai-message, .user-message p {
-    	    margin: 6px 0;  /* 控制段落间距 */
-        }
- 
-      .ai-message, .user-message pre {
-            margin: 8px 0;  /* 代码块间距控制 */
-        }
-
-      .ds-content.pb-12px.inline-flex:hover  {
+       .ds-content.reasoning-toggle:hover {
             background: #e5e5e5;
         }
 
-      .ds-content.pb-12px.h-18px  {
-            height: 18px;
-            font-size: 13px;
-            line-height: 18px;
-            color: #333;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-      .ds-content.pb-12px.svg-icon  {
-            width: 18px;
-            height: 18px;
-        }
-
-      .ds-content.pb-12px.ml-6px  {
-            margin-left: 6px;
-        }
-
-      .ds-content.pb-12px.mr-8px  {
-            margin-right: 8px;
-        }
-
-      .ds-content.pb-12px.size-16px  {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.25s;
-        }
-
-      .ds-content.pb-12px.w-full  {
+       .ds-content.reasoning-content {
             width: 100%;
-        }
-
-      .ds-content.pb-12px.text-left  {
             text-align: left;
-        }
-
-      .ds-content.pb-12px.text-primary-opacity  {
             color: rgba(51, 51, 51, 0.5);
-        }
-
-      .ds-content.pb-12px.text-opacity-50  {
             opacity: 0.5;
-        }
-
-      .ds-content.pb-12px.text-14px  {
             font-size: 14px;
-        }
-
-      .ds-content.pb-12px.leading-22px  {
             line-height: 22px;
-        }
-
-      .ds-content.pb-12px.pl-18px  {
             padding-left: 18px;
-        }
-
-      .ds-content.pb-12px.border-left-2px  {
             border-left: 2px solid #E5E5E5;
+            white-space: pre-wrap;
+            display: none;
         }
 
-      .ds-content.pb-12px.whitespace-pre-wrap  {
-            white-space: pre-wrap;
+       .ai-message p,
+       .user-message p {
+            margin: 6px 0;
+        }
+
+       .ai-message pre,
+       .user-message pre {
+            margin: 8px 0;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
 </head>
 
 <body>
     <div class="chat-container">
         <div class="chat-messages" id="chatMessages"></div>
         <div class="input-area">
-            <textarea id="userInput" placeholder="和AI聊点什么吧..." rows="3" style="width: 82.5%; resize: none;"></textarea> <!-- 修改为 textarea 并增加宽度样式，并设置为不可手动更改大小 -->
+            <textarea id="userInput" placeholder="和AI聊点什么吧..." rows="3" style="width: 82.5%; resize: none;"></textarea>
             <div class="menu-icon" onclick="toggleMenu()">☰</div>
             <button onclick="sendMessage()">发送</button>
         </div>
@@ -309,22 +245,25 @@
 
     <script>
         // Base64加密的API密钥
-        const API_KEY_OFFICIAL_ENCODED = 'c2lnbmF0dXJlMWQ0NmUxZTI0MjU0NTRmY2ZhZTdiNmI1Zjg4NjRhYw==';
-        const API_KEY_SILICONFLOW_ENCODED = 'c2lnbmF0dXJlMmZmZmVkNWU1Y3RmZWZyZW1heWx0aWVzZW5naW5lZXJmamF2ZWQ=';
-        const API_KEY_CHATANYWHERE_ENCODED = 'c2lnbmF0dXJlMnV4Y2xNY1NoN3dXU2s0S2xKQ0JiQVV4U0J3R2RFQW5Oc1BBRHY=';
-        const API_KEY_MOONSHOT_ENCODED = 'c2lnbmF0dXJlMk5vdGVuU3MyNWZ0UGZ4N2VjMjU3QjZmM2IxM2VwRGU9M2ZC';
+        const API_KEY_OFFICIAL_ENCODED = 'YzJzdE1XUTBObVV4WlRFeU5ESTFOR1pqWm1GbE4ySTJaVGRpTldZNE9EWTBNR1U9';
+        const API_KEY_SILICONFLOW_ENCODED = 'YzJzdFptOW1aSFZzZFc5eWVtWmxabWwzYzJoa1ozWnBjMlowYm5OdmQyWjJaR0p6Y1dWMlkyOTFkbkZoZDJ0MVkyTmk=';
+        const API_KEY_CHATANYWHERE_ENCODED = 'YzJzdGRWaFNZekpyV1VkdU0xZHpTMnd4VTNFMFFrcHViRU5KZGxaWVJHSlhSa0kzZEhKelZqZG9ZbHg=';
+        const API_KEY_MOONSHOT_ENCODED = 'YzJzdFRuZHZURlJYY0VkMGJ6ZHRPRzE1Y1RGemRrbFZTRUoxU1dWb00yMDJkRVJCZEVobGNGcDFNSGd6UVROM1J6Qm8=';
 
         // 解密函数
         function decodeApiKey(apiKeyEncoded) {
-            return atob(apiKeyEncoded);
+            return window.atob(window.atob(apiKeyEncoded));
         }
 
         // 解密API密钥
         const API_KEY_OFFICIAL = decodeApiKey(API_KEY_OFFICIAL_ENCODED);
+        console.log(API_KEY_OFFICIAL)
         const API_KEY_SILICONFLOW = decodeApiKey(API_KEY_SILICONFLOW_ENCODED);
+        console.log(API_KEY_SILICONFLOW)
         const API_KEY_CHATANYWHERE = decodeApiKey(API_KEY_CHATANYWHERE_ENCODED);
+        console.log(API_KEY_CHATANYWHERE)
         const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
-
+        console.log(API_KEY_MOONSHOT)   
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
@@ -339,127 +278,121 @@
 
         // 切换菜单显示与隐藏
         function toggleMenu() {
-            const menu = document.getElementById('menu'); 
-            menu.style.display  = menu.style.display  === 'flex'? 'none' : 'flex';
+            const menu = document.getElementById('menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
         }
 
         // 监听菜单外的点击事件以关闭菜单
-        document.addEventListener('click',  (event) => {
-            const menu = document.getElementById('menu'); 
-            const menuIcon = document.querySelector('.menu-icon'); 
-            if (!menu.contains(event.target)  &&!menuIcon.contains(event.target))  {
-                menu.style.display  = 'none';
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('menu');
+            const menuIcon = document.querySelector('.menu-icon');
+            if (!menu.contains(event.target) && !menuIcon.contains(event.target)) {
+                menu.style.display = 'none';
             }
         });
 
         // 处理源选择变化
         function handleSourceChange() {
-            const sourceSelect = document.getElementById('sourceSelect'); 
-            isSiliconFlowSource = sourceSelect.value  === 'siliconflow';
-            isChatAnywhereSource = sourceSelect.value  === 'chatanywhere';
+            const sourceSelect = document.getElementById('sourceSelect');
+            isSiliconFlowSource = sourceSelect.value === 'siliconflow';
+            isChatAnywhereSource = sourceSelect.value === 'chatanywhere';
             isMoonShotSource = sourceSelect.value === 'moonshot';
 
             // 显示或隐藏深度思考开关和模型选择
-            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden',  isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource); 
-            document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource  ||!isCustomModel);
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource);
+            document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
             document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
             document.getElementById('moonshotWebSearchContainer').classList.toggle('hidden',!isMoonShotSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || sourceSelect.value === 'official'); // ChatAnyWhere源和MoonShot源不显示硅基流动源的模型列表，官方源不显示模型下拉栏
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || sourceSelect.value === 'official');
         }
 
         // 处理模型选择变化
         function handleModelChange() {
-            const modelSelect = document.getElementById('modelSelect'); 
-            selectedModel = modelSelect.value; 
+            const modelSelect = document.getElementById('modelSelect');
+            selectedModel = modelSelect.value;
             isCustomModel = selectedModel === 'custom';
 
             // 显示或隐藏自定义模型输入框
-            document.getElementById('customModelContainer').classList.toggle('hidden',!isCustomModel); 
+            document.getElementById('customModelContainer').classList.toggle('hidden',!isCustomModel);
         }
 
         // 添加消息到聊天窗口
         function appendMessage(content, isUser = false, reasoningContent = null) {
-            const messagesDiv = document.getElementById('chatMessages'); 
-            const md = window.markdownit(); 
-        
+            const messagesDiv = document.getElementById('chatMessages');
+            const md = window.markdownit();
+
             // 如果有深度思考内容，先添加深度思考内容
             if (reasoningContent) {
-                const reasoningDiv = document.createElement('div'); 
-                reasoningDiv.className  = 'ds-content pb-12px flex flex-col';
-                reasoningDiv.innerHTML  = `
+                const reasoningDiv = document.createElement('div');
+                reasoningDiv.className = 'ds-content reasoning';
+                reasoningDiv.innerHTML = `
                     <div class="mb-16px">
-                        <div class="inline-flex items-center cursor-pointer rounded-[10px] pl-[10px] pr-[16px] py-[7px] relative hover:bg-gray-nav-hover bg-secondary toggle-reasoning">
-                            <div class="h-18px text-[13px] leading-18px text-primary flex items-center relative">
-                                <div class="ml-6px mr-8px">已深度思考</div>
-                                <div class="size-16px flex items-center justify-center cursor-pointer transition-transform transition-[0.25s] transform ">
-                                </div>
-                            </div>
+                        <div class="reasoning-toggle">
+                            <div>已深度思考</div>
                         </div>
                     </div>
-                    <div class="w-full flex text-left text-primary-opacity text-opacity-50 text-[14px] leading-[22px] reasoning-content hidden">
-                        <div class="w-full pl-18px border-left-2px whitespace-pre-wrap border-[#E5E5E5]">${reasoningContent}</div>
+                    <div class="reasoning-content">
+                        <div>${reasoningContent}</div>
                     </div>
                 `;
-                messagesDiv.appendChild(reasoningDiv); 
-        
+                messagesDiv.appendChild(reasoningDiv);
+
                 // 添加点击事件以展开或收起深度思考内容
-                const toggleButton = reasoningDiv.querySelector('.toggle-reasoning'); 
+                const toggleButton = reasoningDiv.querySelector('.reasoning-toggle');
                 if (toggleButton) {
-                    toggleButton.addEventListener('click',  function () {
-                        const contentDiv = reasoningDiv.querySelector('.reasoning-content'); 
+                    toggleButton.addEventListener('click', function () {
+                        const contentDiv = reasoningDiv.querySelector('.reasoning-content');
                         if (contentDiv) {
-                            contentDiv.classList.toggle('hidden'); 
+                            contentDiv.classList.toggle('hidden');
                         }
                     });
                 }
             }
-        
+
             // 添加消息
-            const messageDiv = document.createElement('div'); 
-            messageDiv.className  = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            messageDiv.innerHTML  = md.render(content); 
-            messagesDiv.appendChild(messageDiv); 
-        
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            messageDiv.innerHTML = md.render(content);
+            messagesDiv.appendChild(messageDiv);
+
             // 滚动到底部
-            messagesDiv.scrollTop  = messagesDiv.scrollHeight; 
-        
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
             // 调试信息
-            console.log(' 消息添加成功:', { content, isUser, reasoningContent });
+            console.log('消息添加成功:', { content, isUser, reasoningContent });
         }
- 
-        
+
         // 发送消息
         async function sendMessage() {
-            const input = document.getElementById('userInput'); 
-            const userMessage = input.value.trim(); 
+            const input = document.getElementById('userInput');
+            const userMessage = input.value.trim();
             if (!userMessage) return;
-        
-            input.value  = '';
+
+            input.value = '';
             appendMessage(userMessage, true);
-        
+
             // 更新对话历史
             if (isContextEnabled) {
-                conversationHistory.push({  role: 'user', content: userMessage });
+                conversationHistory.push({ role: 'user', content: userMessage });
             } else {
                 conversationHistory = [{ role: 'user', content: userMessage }];
             }
-        
+
             try {
-                
-                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions'  : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions'; 
+                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions';
                 const apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : isMoonShotSource ? API_KEY_MOONSHOT : API_KEY_OFFICIAL;
                 let model;
-        
+
                 if (isSiliconFlowSource) {
-                    model = isCustomModel ? document.getElementById('customModelInput').value  : selectedModel;
+                    model = isCustomModel ? document.getElementById('customModelInput').value : selectedModel;
                 } else if (isChatAnywhereSource) {
                     model = document.getElementById('chatAnywhereModelSelect').value;
                 } else if (isMoonShotSource) {
                     model = document.getElementById('moonshotModelSelect').value;
                 } else {
-                    // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型 
+                    // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型
                     model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
                 }
 
@@ -478,72 +411,73 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         model: model,
                         messages: conversationHistory,
                         temperature: 0.7,
-                        tools: tools,  // 添加 tools 参数
+                        tools: tools,
                         // 添加深度思考参数
-                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled)
+                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1') || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled)
                     })
                 });
-        
-                if (!response.ok)  {
-                    throw new Error(`API 请求失败: ${response.statusText}`); 
+
+                const data = await response.json();
+                console.log('API 响应:', data); // 调试信息，检查响应结构
+
+                if (!response.ok) {
+                    throw new Error(`API 请求失败: ${response.statusText}`);
                 }
-        
-                const data = await response.json(); 
-                console.log('API  响应:', data); // 调试信息，检查响应结构 
-        
-                // 确保 data.choices  存在且有内容
-                const choices = data.choices  && data.choices.length  > 0 ? data.choices  : [];
+
+                // 确保 data.choices 存在且有内容
+                const choices = data.choices && data.choices.length > 0 ? data.choices : [];
                 const aiResponse = choices[0]?.message?.content || '无法获取回复';
                 const reasoningContent = choices[0]?.message?.reasoning_content || null;
-        
-                // 更新对话历史 
+
+                // 更新对话历史
                 if (isContextEnabled) {
-                    conversationHistory.push({  role: 'assistant', content: aiResponse });
+                    conversationHistory.push({ role: 'assistant', content: aiResponse });
                 }
-        
+
                 // 判断是否显示深度思考内容
-                const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1')  || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled);
+                const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1') || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled);
                 appendMessage(aiResponse, false, showDeepThinking && reasoningContent ? reasoningContent : null);
-        
+
                 // 调试信息
-                console.log('AI  回复:', { aiResponse, reasoningContent, showDeepThinking });
+                console.log('AI 回复:', { aiResponse, reasoningContent, showDeepThinking });
             } catch (error) {
                 appendMessage('服务器繁忙，请稍后再试。（您可尝试切换源）');
                 if (error.response) {
-            console.log('API响应:', await error.response.json());
-        }
+                    console.log('API响应:', await error.response.json());
+                }
             }
         }
+
         // 回车发送
-        document.getElementById('userInput').addEventListener('keypress',  (e) => {
-            if (e.key  === 'Enter' && !e.ctrlKey) {
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.ctrlKey) {
                 e.preventDefault(); // 阻止默认行为
                 sendMessage();
             }
         });
 
         // 上下文开关处理
-        document.getElementById('contextSwitch').addEventListener('change',  (e) => {
-            isContextEnabled = e.target.checked; 
+        document.getElementById('contextSwitch').addEventListener('change', (e) => {
+            isContextEnabled = e.target.checked;
         });
 
         // 深度思考开关处理
-        document.getElementById('deepThinkingSwitch').addEventListener('change',  (e) => {
-            isDeepThinkingEnabled = e.target.checked; 
+        document.getElementById('deepThinkingSwitch').addEventListener('change', (e) => {
+            isDeepThinkingEnabled = e.target.checked;
         });
 
         // 尝试深度思考开关处理
-        document.getElementById('tryDeepThinking').addEventListener('change',  (e) => {
-            tryDeepThinking = e.target.checked; 
+        document.getElementById('tryDeepThinking').addEventListener('change', (e) => {
+            tryDeepThinking = e.target.checked;
         });
 
         // Moonshot联网搜索开关处理
-        document.getElementById('moonshotWebSearch').addEventListener('change',  (e) => {
-            isMoonshotWebSearchEnabled = e.target.checked; 
+        document.getElementById('moonshotWebSearch').addEventListener('change', (e) => {
+            isMoonshotWebSearchEnabled = e.target.checked;
         });
     </script>
 </body>
