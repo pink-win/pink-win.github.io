@@ -396,14 +396,16 @@
                     model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
                 }
 
-                const tools = isMoonShotSource && isMoonshotWebSearchEnabled ? [
-                    {
+                let tools = [];
+
+                if (isMoonShotSource && isMoonshotWebSearchEnabled) {
+                    tools.push({
                         "type": "builtin_function",
                         "function": {
                             "name": "$web_search",
                         },
-                    }
-                ] : [];
+                    });
+                }
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
