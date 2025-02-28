@@ -373,9 +373,12 @@
             input.value = '';
             appendMessage(userMessage, true);
 
-            // 更新对话历史
+            // 更新对话历史 - 确保消息交替
             if (isContextEnabled) {
                 conversationHistory.push({ role: 'user', content: userMessage });
+            } else if (model === 'deepseek-reasoner' && conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'assistant') {
+                // 当使用深度思考时，即使上下文关闭也保留最后一条assistant消息
+                conversationHistory = [conversationHistory[conversationHistory.length - 1], { role: 'user', content: userMessage }];
             } else {
                 conversationHistory = [{ role: 'user', content: userMessage }];
             }
@@ -440,6 +443,10 @@
 
                 // 更新对话历史
                 if (isContextEnabled) {
+                    conversationHistory.push({ role: 'assistant', content: aiResponse });
+                } else if (model === 'deepseek-reasoner') {
+                    // 保留最后两条消息（user和assistant）
+                    conversationHistory = conversationHistory.slice(-1);
                     conversationHistory.push({ role: 'assistant', content: aiResponse });
                 }
 
