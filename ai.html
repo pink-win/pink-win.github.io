@@ -299,7 +299,10 @@
             .then(response => response.text())
             .then(data => {
                 const decodedData = window.atob(data); // Base64解密
-                sensitiveWords = decodedData.split('\n'); // 存储屏蔽词
+                // 使用filter清理空行和多余空格
+                sensitiveWords = decodedData.split('\n')
+                    .map(word => word.trim()) // 去掉每行的前后空格
+                    .filter(word => word.length > 0); // 过滤掉空行
             });
 
         // 切换菜单显示与隐藏
