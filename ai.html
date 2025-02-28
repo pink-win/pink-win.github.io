@@ -298,13 +298,23 @@
         fetch('sensitive-words/sensitive-words.wlist')
             .then(response => response.text())
             .then(data => {
-                const decodedData = window.decodeURIComponent(window.atob(data)); // Base64解密
-                // 使用正则表达式分割换行符，处理不同类型的换行符
-                sensitiveWords = decodedData.split(/\r?\n/) // 处理 \n 和 \r\n
-                    .map(word => word.trim()) // 去掉每行的前后空格
-                    .filter(word => word.length > 0); // 过滤掉空行
+                // Base64解密
+                const binaryString = window.atob(data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
 
-                console.log(sensitiveWords); // 调试输出，查看敏感词列表
+                // 使用 TextDecoder 解码为 UTF-8
+                const decodedData = new TextDecoder('utf-8').decode(bytes);
+                
+                sensitiveWords = decodedData.split(/\r?\n/) // 处理换行符
+                    .map(word => word.trim()) // 去掉前后空格
+                    .filter(word => word.length > 0); // 过滤空行
+
+                console.log(sensitiveWords); // 调试输出
             });
 
         // 切换菜单显示与隐藏
