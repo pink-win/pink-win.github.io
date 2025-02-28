@@ -369,7 +369,10 @@
 
             // 检查消息中是否包含敏感词
             if (sensitiveWords.some(word => content.includes(word))) {
-                messageDiv.innerHTML = messageDiv.innerHTML.replace(new RegExp(sensitiveWords.join('|'), 'g'), match => '*'.repeat(match.length));
+                sensitiveWords.forEach(word => {
+                    const regex = new RegExp(word, 'g');
+                    messageDiv.innerHTML = messageDiv.innerHTML.replace(regex, `<span class="sensitive-word">${word}</span>`);
+                });
             }
 
             // 检查AI消息中是否包含敏感词
