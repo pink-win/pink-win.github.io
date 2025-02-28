@@ -303,6 +303,8 @@
                 sensitiveWords = decodedData.split(/\r?\n/) // 处理 \n 和 \r\n
                     .map(word => word.trim()) // 去掉每行的前后空格
                     .filter(word => word.length > 0); // 过滤掉空行
+
+                console.log(sensitiveWords); // 调试输出，查看敏感词列表
             });
 
         // 切换菜单显示与隐藏
