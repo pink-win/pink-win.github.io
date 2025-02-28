@@ -299,8 +299,8 @@
             .then(response => response.text())
             .then(data => {
                 const decodedData = window.atob(data); // Base64解密
-                // 使用filter清理空行和多余空格
-                sensitiveWords = decodedData.split('\n')
+                // 使用正则表达式分割换行符，处理不同类型的换行符
+                sensitiveWords = decodedData.split(/\r?\n/) // 处理 \n 和 \r\n
                     .map(word => word.trim()) // 去掉每行的前后空格
                     .filter(word => word.length > 0); // 过滤掉空行
             });
