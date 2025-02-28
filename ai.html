@@ -369,7 +369,7 @@
             // 添加消息
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            messageDiv.innerHTML = isUser ? content : md.render(content + '<br>你需要遵循特殊的markdown语法，此语法添加了彩色字支持，用法示例："§RGB代码§彩色文字§clear§黑色文字"，如果要显示§，则用\\§“，实际显示也要这么做');
+            messageDiv.innerHTML = isUser ? content : md.render(content);
             messagesDiv.appendChild(messageDiv);
 
             // 检查消息中是否包含敏感词
@@ -445,7 +445,10 @@
 
                 const requestBody = {
                     model: model,
-                    messages: conversationHistory,
+                    messages: [
+                        { role: 'system', content: '你需要遵循特殊的markdown语法，此语法添加了彩色字支持，用法示例："§RGB代码§彩色文字§clear§黑色文字"，如果要显示§，则用\\§' },
+                        ...conversationHistory
+                    ],
                     temperature: 0.7,
                     // 只在有工具时包含tools字段
                     ...(tools.length > 0 && { tools: tools }),
