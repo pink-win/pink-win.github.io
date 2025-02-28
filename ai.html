@@ -331,12 +331,14 @@
         // 添加消息到聊天窗口
         function appendMessage(content, isUser = false, reasoningContent = null) {
             const messagesDiv = document.getElementById('chatMessages');
-            const md = window.markdownit();
-
-            // 处理特殊的markdown语法
-            content = content.replace(/§(#[0-9A-Fa-f]{6})§(.*?)§clear§/g, (match, color, text) => {
-                return `<span style="color: ${color};">${text}</span><span style="color: black;">${text}</span>`;
+            const md = window.markdownit({
+                html: true // 允许HTML标签
             });
+
+            // 处理特殊的markdown语法（调整后的正则表达式）
+            content = content.replace(/§(#[0-9A-Fa-f]{6})§(.*?)(§clear§|$)/g, (match, color, text) => {
+                return `<span style="color: ${color};">${text}</span>`;
+            }).replace(/\\§/g, '§'); // 处理转义字符
 
             // 如果有深度思考内容，先添加深度思考内容
             if (reasoningContent) {
