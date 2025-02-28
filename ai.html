@@ -364,7 +364,7 @@
             // 添加消息
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            messageDiv.innerHTML = md.render(content);
+            messageDiv.innerHTML = isUser ? content : md.render(content);
             messagesDiv.appendChild(messageDiv);
 
             // 检查消息中是否包含敏感词
