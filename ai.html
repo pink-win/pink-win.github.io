@@ -333,6 +333,11 @@
             const messagesDiv = document.getElementById('chatMessages');
             const md = window.markdownit();
 
+            // 处理特殊的markdown语法
+            content = content.replace(/§(#[0-9A-Fa-f]{6})§(.*?)§clear§/g, (match, color, text) => {
+                return `<span style="color: ${color};">${text}</span>`;
+            });
+
             // 如果有深度思考内容，先添加深度思考内容
             if (reasoningContent) {
                 const reasoningDiv = document.createElement('div');
@@ -364,7 +369,7 @@
             // 添加消息
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            messageDiv.innerHTML = isUser ? content : md.render(content);
+            messageDiv.innerHTML = isUser ? content : md.render(content + '<br>你需要遵循特殊的markdown语法，此语法添加了彩色字支持，用法示例："§RGB代码§彩色文字§clear§黑色文字"，如果要显示§，则用\\§“，实际显示也要这么做');
             messagesDiv.appendChild(messageDiv);
 
             // 检查消息中是否包含敏感词
