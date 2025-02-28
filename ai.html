@@ -335,7 +335,7 @@
 
             // 处理特殊的markdown语法
             content = content.replace(/§(#[0-9A-Fa-f]{6})§(.*?)§clear§/g, (match, color, text) => {
-                return `<span style="color: ${color};">${text}</span>`;
+                return `<span style="color: ${color};">${text}</span><span style="color: black;">${text}</span>`;
             });
 
             // 如果有深度思考内容，先添加深度思考内容
