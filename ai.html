@@ -274,9 +274,13 @@
 
         // 解密API密钥
         const API_KEY_OFFICIAL = decodeApiKey(API_KEY_OFFICIAL_ENCODED);
+        console.log(API_KEY_OFFICIAL)
         const API_KEY_SILICONFLOW = decodeApiKey(API_KEY_SILICONFLOW_ENCODED);
+        console.log(API_KEY_SILICONFLOW)
         const API_KEY_CHATANYWHERE = decodeApiKey(API_KEY_CHATANYWHERE_ENCODED);
-        const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);   
+        console.log(API_KEY_CHATANYWHERE)
+        const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
+        console.log(API_KEY_MOONSHOT)   
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
@@ -294,7 +298,8 @@
         fetch('sensitive-words/sensitive-words.wlist')
             .then(response => response.text())
             .then(data => {
-                sensitiveWords = data.split('\n').map(word => window.atob(word)).filter(word => word); // 解密并过滤空行
+                const decodedData = window.atob(data); // Base64解密
+                sensitiveWords = decodedData.split('\n'); // 存储屏蔽词
             });
 
         // 切换菜单显示与隐藏
