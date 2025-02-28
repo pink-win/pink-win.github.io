@@ -387,10 +387,15 @@
         // 发送消息
         async function sendMessage() {
             const input = document.getElementById('userInput');
-            const userMessage = input.value.trim();
+            let userMessage = input.value.trim();
             if (!userMessage) return;
 
-            input.value = '';
+            // 检查用户消息中是否包含敏感词
+            if (sensitiveWords.some(word => userMessage.includes(word))) {
+                userMessage = userMessage.replace(new RegExp(sensitiveWords.join('|'), 'g'), match => '*'.repeat(match.length));
+            }
+
+            input.value = userMessage;
             appendMessage(userMessage, true);
 
             // 更新对话历史 - 确保消息交替
