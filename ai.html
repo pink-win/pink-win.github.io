@@ -177,6 +177,10 @@
        .user-message pre {
             margin: 8px 0;
         }
+
+       .sensitive-word {
+            color: red;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
 </head>
@@ -276,6 +280,12 @@
         let isMoonshotWebSearchEnabled = false; // Moonshot联网搜索开关状态
         let conversationHistory = []; // 对话历史
 
+        // 加载敏感词列表
+        let sensitiveWords = [];
+        fetch('sensitive-words/sensitive-words.wlist')
+            .then(response => response.text())
+            .then(data => sensitiveWords = data.split('\n'));
+
         // 切换菜单显示与隐藏
         function toggleMenu() {
             const menu = document.getElementById('menu');
@@ -356,6 +366,16 @@
             messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
             messageDiv.innerHTML = md.render(content);
             messagesDiv.appendChild(messageDiv);
+
+            // 检查消息中是否包含敏感词
+            if (sensitiveWords.some(word => content.includes(word))) {
+                messageDiv.innerHTML = messageDiv.innerHTML.replace(new RegExp(sensitiveWords.join('|'), 'g'), match => '*'.repeat(match.length));
+            }
+
+            // 检查AI消息中是否包含敏感词
+            if (!isUser && sensitiveWords.some(word => content.includes(word))) {
+                messageDiv.innerHTML += '<p class="sensitive-word">可能含不适宜内容</p>';
+            }
 
             // 滚动到底部
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
