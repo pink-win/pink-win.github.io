@@ -12,6 +12,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            line-height: 1.4;
         }
 
        .chat-container {
@@ -33,13 +34,13 @@
         }
 
        .message {
-            margin: 10px 0;
+            margin: 5px 0;
             padding: 12px 18px;
             border-radius: 15px;
             max-width: 70%;
             animation: fadeIn 0.3s ease;
             white-space: pre-wrap;
-            line-height: 1.5;
+            line-height: 1.4;
             word-break: break-word;
         }
 
@@ -69,6 +70,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
+            margin: 5px 0;
         }
 
         button {
@@ -110,6 +112,7 @@
             align-items: center;
             gap: 10px;
             justify-content: space-between;
+            margin: 5px 0;
         }
 
        .ds-content {
@@ -180,6 +183,16 @@
 
        .sensitive-word {
             color: red;
+        }
+
+        /* 调整列表样式 */
+        ol, ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 2px 0;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
