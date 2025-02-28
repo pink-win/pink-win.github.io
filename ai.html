@@ -310,6 +310,7 @@
                 // 使用 TextDecoder 解码为 UTF-8
                 const decodedData = new TextDecoder('utf-8').decode(bytes);
                 
+                // 处理敏感词
                 sensitiveWords = decodedData.split(/\r?\n/) // 处理换行符
                     .map(word => word.trim()) // 去掉前后空格
                     .filter(word => word.length > 0); // 过滤空行
