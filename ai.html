@@ -214,6 +214,7 @@
                     <option value="siliconflow">硅基流动源</option>
                     <option value="chatanywhere">ChatAnyWhere源</option>
                     <option value="moonshot">MoonShot官方源</option>
+                    <option value="lmuai">LMU AI源</option>
                 </select>
             </div>
             <div class="menu-item" id="deepThinkingSwitchContainer">
@@ -257,6 +258,13 @@
                 <label for="moonshotWebSearch">联网搜索开关</label>
                 <input type="checkbox" id="moonshotWebSearch">
             </div>
+            <div class="menu-item hidden" id="lmuaiModelSelectContainer">
+                <label for="lmuaiModelSelect">选择模型</label>
+                <select id="lmuaiModelSelect">
+                    <option value="67c44ee90723ed7977f8f83b">DeepSeek R1</option>
+                    <option value="67c44d7e0723ed7977f8f534">Gemini 2 Flash</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -266,6 +274,7 @@
         const API_KEY_SILICONFLOW_ENCODED = 'YzJzdFptOW1aSFZzZFc5eWVtWmxabWwzYzJoa1ozWnBjMlowYm5OdmQyWjJaR0p6Y1dWMlkyOTFkbkZoZDJ0MVkyTmk=';
         const API_KEY_CHATANYWHERE_ENCODED = 'YzJzdGRWaFNZekpyV1VkdU0xZHpTMnd4VTNFMFFrcHViRU5KZGxaWVJHSlhSa0kzZEhKelZqZG9Zbkk0ZG14c09GbHg=';
         const API_KEY_MOONSHOT_ENCODED = 'YzJzdFRuZHZURlJYY0VkMGJ6ZHRPRzE1Y1RGemRrbFZTRUoxU1dWb00yMDJkRVJCZEVobGNGcDFNSGd6UVROM1J6Qm8=';
+        const API_KEY_LMUAI_ENCODED = 'YzJzdE5HUTJlV2x2YzNkbU1uSjNlbTlyY21GaVltTmxlVGQx';
 
         // 解密函数
         function decodeApiKey(apiKeyEncoded) {
@@ -281,11 +290,13 @@
         // console.log(API_KEY_CHATANYWHERE)
         const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
         // console.log(API_KEY_MOONSHOT)   
+        const API_KEY_LMUAI = decodeApiKey(API_KEY_LMUAI_ENCODED);
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
         let isChatAnywhereSource = false; // 是否使用ChatAnyWhere源
         let isMoonShotSource = false; // 是否使用MoonShot官方源
+        let isLmuaiSource = false; // 是否使用LMU AI源
         let selectedModel = 'deepseek-ai/DeepSeek-R1'; // 当前选择的模型
         let isCustomModel = false; // 是否选择自定义模型
         let tryDeepThinking = false; // 是否尝试深度思考
@@ -328,15 +339,17 @@
             isSiliconFlowSource = sourceSelect.value === 'siliconflow';
             isChatAnywhereSource = sourceSelect.value === 'chatanywhere';
             isMoonShotSource = sourceSelect.value === 'moonshot';
+            isLmuaiSource = sourceSelect.value === 'lmuai';
 
             // 显示或隐藏深度思考开关和模型选择
-            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource);
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isLmuaiSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isLmuaiSource);
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
             document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
             document.getElementById('moonshotWebSearchContainer').classList.toggle('hidden',!isMoonShotSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || sourceSelect.value === 'official');
+            document.getElementById('lmuaiModelSelectContainer').classList.toggle('hidden', !isLmuaiSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || isLmuaiSource || sourceSelect.value === 'official');
         }
 
         // 处理模型选择变化
@@ -368,11 +381,11 @@
                 reasoningDiv.innerHTML = `
                     <div class="mb-16px">
                         <div class="reasoning-toggle">
-                            <div>已深度思考</div>
+                            <div>${isLmuaiSource && selectedModel === '67c44ee90723ed7977f8f83b' ? '不支持深度思考' : '已深度思考'}</div>
                         </div>
                     </div>
                     <div class="reasoning-content">
-                        <div>${reasoningContent}</div>
+                        <div>${isLmuaiSource && selectedModel === '67c44ee90723ed7977f8f83b' ? '' : reasoningContent}</div>
                     </div>
                 `;
                 messagesDiv.appendChild(reasoningDiv);
@@ -440,8 +453,17 @@
             }
 
             try {
-                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions';
-                const apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : isMoonShotSource ? API_KEY_MOONSHOT : API_KEY_OFFICIAL;
+                const apiUrl = isLmuaiSource ? 'https://ai.fulitimes.com/api/openapi/v1/chat/completions' : 
+                    isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : 
+                    isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 
+                    isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 
+                    'https://api.deepseek.com/v1/chat/completions';
+                
+                const apiKey = isLmuaiSource ? `${API_KEY_LMUAI}-${document.getElementById('lmuaiModelSelect').value}` :
+                    isSiliconFlowSource ? API_KEY_SILICONFLOW : 
+                    isChatAnywhereSource ? API_KEY_CHATANYWHERE : 
+                    isMoonShotSource ? API_KEY_MOONSHOT : 
+                    API_KEY_OFFICIAL;
                 let model;
 
                 if (isSiliconFlowSource) {
@@ -466,12 +488,21 @@
                     });
                 }
 
-                const requestBody = {
+                const requestBody = isLmuaiSource ? {
+                    chatId: "",
+                    stream: false,
+                    messages: [
+                        {
+                            role: 'user',
+                            content: userMessage
+                        }
+                    ]
+                } : {
                     model: model,
                     messages: [
                         {
                             role: 'system',
-                            content: `你可以使用特殊标记语法为文字添加颜色，格式为：
+                            content: `因为我们的独家markdown渲染器支持，你可以使用特殊标记语法为文字添加颜色，格式为：
                                     §颜色代码§需要变色的文字§clear§
 
                                     使用规范：
@@ -487,10 +518,16 @@
 
                                     注意事项：
                                     • 颜色代码必须包含#号
-                                    • 不要将标记语法用于代码块中
+                                    • ※不要将标记语法用于代码块中
                                     • 确保每个颜色（或切换颜色时）都用 §clear§ 正确闭合，否则将显示错误（示例：§#0000ff§蓝§clear§§#ff0000§红§clear§，嵌套也要遵守语法）
                                     • 用户已经安装特殊markdown渲染器，可以正常显示彩色文本，不要担心
-                                    • 仅当需要时再用，不要太过好奇`
+                                    • 最重要：※仅当用户需要时/markdown格式输出时使用，不要太过好奇
+                                    • ※不要尝试教用户此语法，因为此语法是我们独创，除我们的渲染器外都 不支持 此语法。
+                                    • ※在正常情况下，不要重复用户的话语，这可能引起用户们的愤怒。
+                                    
+                                    除此之外：
+                                    • ※请按照用户使用的语言来回复（如果用户使用的不是中文的话）。` 
+
                         },
                         ...conversationHistory
                     ],
