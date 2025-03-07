@@ -258,6 +258,16 @@
                 <label for="moonshotWebSearch">联网搜索开关</label>
                 <input type="checkbox" id="moonshotWebSearch">
             </div>
+            <div class="menu-item hidden" id="baiduModelSelectContainer">
+                <label for="baiduModelSelect">选择百度云模型</label>
+                <select id="baiduModelSelect">
+                    <option value="ernie-4.0-turbo-8k">ernie-4.0-turbo-8k</option>
+                    <option value="ernie-3.5-128k">ernie-3.5-128k</option>
+                    <option value="ernie-speed-pro-128k">ernie-speed-pro-128k</option>
+                    <option value="ernie-lite-pro-128k">ernie-lite-pro-128k</option>
+                    <option value="deepseek-r1-distill-llama-8b">deepseek-r1-distill-llama-8b</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -332,6 +342,7 @@
             // 显示或隐藏深度思考开关和模型选择
             document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isBaiduSource);
             document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isBaiduSource);
+            document.getElementById('baiduModelSelectContainer').classList.toggle('hidden', !isBaiduSource);
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
             document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
@@ -418,43 +429,33 @@
         // 发送消息
         async function sendMessage() {
             const input = document.getElementById('userInput');
-            let userMessage = input.value.trim();
+            const userMessage = input.value.trim();
             if (!userMessage) return;
 
-            // 检查用户消息中是否包含敏感词
-            if (sensitiveWords.some(word => userMessage.includes(word))) {
-                userMessage = userMessage.replace(new RegExp(sensitiveWords.join('|'), 'g'), match => '*'.repeat(match.length));
-            }
-
-            input.value = userMessage;
+            input.value = '';
             appendMessage(userMessage, true);
 
-            // 更新对话历史 - 确保消息交替
+            // 更新对话历史
             if (isContextEnabled) {
                 conversationHistory.push({ role: 'user', content: userMessage });
-            } else if (selectedModel === 'deepseek-reasoner' && conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'assistant') {
-                // 当使用深度思考时，即使上下文关闭也保留最后一条assistant消息
-                conversationHistory = [conversationHistory[conversationHistory.length - 1], { role: 'user', content: userMessage }];
             } else {
                 conversationHistory = [{ role: 'user', content: userMessage }];
             }
 
             try {
-                const apiUrl = isBaiduSource ? 'https://qianfan.baidubce.com/v2/chat/completions' : 
-                    isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : 
-                    isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 
-                    isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 
-                    'https://api.deepseek.com/v1/chat/completions';
-                
-                const apiKey = isBaiduSource ? API_KEY_BAIDU :
-                    isSiliconFlowSource ? API_KEY_SILICONFLOW : 
-                    isChatAnywhereSource ? API_KEY_CHATANYWHERE : 
-                    isMoonShotSource ? API_KEY_MOONSHOT : 
-                    API_KEY_OFFICIAL;
+                const apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : 
+                              isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 
+                              isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 
+                              isBaiduSource ? 'https://qianfan.baidubce.com/v2/chat/completions' : 
+                              'https://api.deepseek.com/v1/chat/completions';
+                const apiKey = isBaiduSource ? API_KEY_BAIDU : 
+                              isSiliconFlowSource ? API_KEY_SILICONFLOW : 
+                              isChatAnywhereSource ? API_KEY_CHATANYWHERE : 
+                              isMoonShotSource ? API_KEY_MOONSHOT : API_KEY_OFFICIAL;
                 let model;
 
                 if (isBaiduSource) {
-                    model = selectedModel;
+                    model = document.getElementById('baiduModelSelect').value; // 使用选择的百度云模型
                 } else if (isSiliconFlowSource) {
                     model = isCustomModel ? document.getElementById('customModelInput').value : selectedModel;
                 } else if (isChatAnywhereSource) {
@@ -462,7 +463,6 @@
                 } else if (isMoonShotSource) {
                     model = document.getElementById('moonshotModelSelect').value;
                 } else {
-                    // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型
                     model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
                 }
 
