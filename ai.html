@@ -214,7 +214,7 @@
                     <option value="siliconflow">硅基流动源</option>
                     <option value="chatanywhere">ChatAnyWhere源</option>
                     <option value="moonshot">MoonShot官方源</option>
-                    <option value="lmuai">LMU AI源（暂不支持生图）</option>
+                    <option value="baidu">百度云官方源</option>
                 </select>
             </div>
             <div class="menu-item" id="deepThinkingSwitchContainer">
@@ -258,13 +258,6 @@
                 <label for="moonshotWebSearch">联网搜索开关</label>
                 <input type="checkbox" id="moonshotWebSearch">
             </div>
-            <div class="menu-item hidden" id="lmuaiModelSelectContainer">
-                <label for="lmuaiModelSelect">选择模型</label>
-                <select id="lmuaiModelSelect">
-                    <option value="67c44ee90723ed7977f8f83b">DeepSeek R1</option>
-                    <option value="67c44d7e0723ed7977f8f534">Gemini 2 Flash</option>
-                </select>
-            </div>
         </div>
     </div>
 
@@ -274,7 +267,7 @@
         const API_KEY_SILICONFLOW_ENCODED = 'YzJzdFptOW1aSFZzZFc5eWVtWmxabWwzYzJoa1ozWnBjMlowYm5OdmQyWjJaR0p6Y1dWMlkyOTFkbkZoZDJ0MVkyTmk=';
         const API_KEY_CHATANYWHERE_ENCODED = 'YzJzdGRWaFNZekpyV1VkdU0xZHpTMnd4VTNFMFFrcHViRU5KZGxaWVJHSlhSa0kzZEhKelZqZG9Zbkk0ZG14c09GbHg=';
         const API_KEY_MOONSHOT_ENCODED = 'YzJzdFRuZHZURlJYY0VkMGJ6ZHRPRzE1Y1RGemRrbFZTRUoxU1dWb00yMDJkRVJCZEVobGNGcDFNSGd6UVROM1J6Qm8=';
-        const API_KEY_LMUAI_ENCODED = 'YzJzdE5HUTJlV2x2YzNkbU1uSjNlbTlyY21GaVltTmxlVGQx';
+        const API_KEY_BAIDU = 'bce-v3/ALTAK-9KIuY3iRAZW2w9O4CHt1G/50edf0baba45f9d79c68f9f6451e983ce8705c50';
 
         // 解密函数
         function decodeApiKey(apiKeyEncoded) {
@@ -283,20 +276,15 @@
 
         // 解密API密钥
         const API_KEY_OFFICIAL = decodeApiKey(API_KEY_OFFICIAL_ENCODED);
-        // console.log(API_KEY_OFFICIAL)
         const API_KEY_SILICONFLOW = decodeApiKey(API_KEY_SILICONFLOW_ENCODED);
-        // console.log(API_KEY_SILICONFLOW)
         const API_KEY_CHATANYWHERE = decodeApiKey(API_KEY_CHATANYWHERE_ENCODED);
-        // console.log(API_KEY_CHATANYWHERE)
         const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
-        // console.log(API_KEY_MOONSHOT)   
-        const API_KEY_LMUAI = decodeApiKey(API_KEY_LMUAI_ENCODED);
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
         let isChatAnywhereSource = false; // 是否使用ChatAnyWhere源
         let isMoonShotSource = false; // 是否使用MoonShot官方源
-        let isLmuaiSource = false; // 是否使用LMU AI源
+        let isBaiduSource = false; // 是否使用百度云官方源
         let selectedModel = 'deepseek-ai/DeepSeek-R1'; // 当前选择的模型
         let isCustomModel = false; // 是否选择自定义模型
         let tryDeepThinking = false; // 是否尝试深度思考
@@ -339,17 +327,16 @@
             isSiliconFlowSource = sourceSelect.value === 'siliconflow';
             isChatAnywhereSource = sourceSelect.value === 'chatanywhere';
             isMoonShotSource = sourceSelect.value === 'moonshot';
-            isLmuaiSource = sourceSelect.value === 'lmuai';
+            isBaiduSource = sourceSelect.value === 'baidu';
 
             // 显示或隐藏深度思考开关和模型选择
-            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isLmuaiSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isLmuaiSource);
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isBaiduSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isBaiduSource);
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
             document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
             document.getElementById('moonshotWebSearchContainer').classList.toggle('hidden',!isMoonShotSource);
-            document.getElementById('lmuaiModelSelectContainer').classList.toggle('hidden', !isLmuaiSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || isLmuaiSource || sourceSelect.value === 'official');
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || isBaiduSource || sourceSelect.value === 'official');
         }
 
         // 处理模型选择变化
@@ -381,11 +368,11 @@
                 reasoningDiv.innerHTML = `
                     <div class="mb-16px">
                         <div class="reasoning-toggle">
-                            <div>${isLmuaiSource && selectedModel === '67c44ee90723ed7977f8f83b' ? '不支持深度思考' : '已深度思考'}</div>
+                            <div>${isBaiduSource && selectedModel === 'baidu' ? '不支持深度思考' : '已深度思考'}</div>
                         </div>
                     </div>
                     <div class="reasoning-content">
-                        <div>${isLmuaiSource && selectedModel === '67c44ee90723ed7977f8f83b' ? '' : reasoningContent}</div>
+                        <div>${isBaiduSource && selectedModel === 'baidu' ? '' : reasoningContent}</div>
                     </div>
                 `;
                 messagesDiv.appendChild(reasoningDiv);
@@ -453,20 +440,22 @@
             }
 
             try {
-                const apiUrl = isLmuaiSource ? 'https://ai.fulitimes.com/api/openapi/v1/chat/completions' : 
+                const apiUrl = isBaiduSource ? 'https://qianfan.baidubce.com/v2/chat/completions' : 
                     isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : 
                     isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 
                     isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 
                     'https://api.deepseek.com/v1/chat/completions';
                 
-                const apiKey = isLmuaiSource ? `${API_KEY_LMUAI}-${document.getElementById('lmuaiModelSelect').value}` :
+                const apiKey = isBaiduSource ? API_KEY_BAIDU :
                     isSiliconFlowSource ? API_KEY_SILICONFLOW : 
                     isChatAnywhereSource ? API_KEY_CHATANYWHERE : 
                     isMoonShotSource ? API_KEY_MOONSHOT : 
                     API_KEY_OFFICIAL;
                 let model;
 
-                if (isSiliconFlowSource) {
+                if (isBaiduSource) {
+                    model = selectedModel;
+                } else if (isSiliconFlowSource) {
                     model = isCustomModel ? document.getElementById('customModelInput').value : selectedModel;
                 } else if (isChatAnywhereSource) {
                     model = document.getElementById('chatAnywhereModelSelect').value;
@@ -488,15 +477,14 @@
                     });
                 }
 
-                const requestBody = isLmuaiSource ? {
-                    chatId: "",
-                    stream: false,
-                    messages: [
-                        {
-                            role: 'user',
-                            content: userMessage
-                        }
-                    ]
+                const requestBody = isBaiduSource ? {
+                    model: model,
+                    messages: [{ role: 'user', content: userMessage }],
+                    web_search: {
+                        enable: false,
+                        enable_citation: false,
+                        enable_trace: false
+                    }
                 } : {
                     model: model,
                     messages: [
@@ -527,7 +515,7 @@
                                                  2※不要尝试教用户此语法，因为此语法是我们独创，除我们的渲染器外都 不支持 此语法。
                                                  3※在正常情况下，不要重复用户的话语，这可能引起用户们的愤怒。
                                     [提示词2]
-                                        如果用户要求你生成图片，按照用户的提示，用你的想象力去生动描述这幅图片的样子（除非用户需要，否则生动描述出来的内容不要直接说），并转换成英文替换掉下面markdown显示图片的url的“占位符”中：
+                                        如果用户要求你生成图片，按照用户的提示，用你的想象力去生动描述这幅图片的样子（除非用户需要，否则生动描述出来的内容不要直接说），并转换成英文替换掉下面markdown显示图片的url的"占位符"中：
                                         ![image](https://image.pollinations.ai/prompt/占位符?width=1024&height=1024&seed=100&model=flux&nologo=true) 
                                     除此之外：
                                     • ※请按照用户使用的语言来回复（如果用户使用的不是中文的话）。` 
