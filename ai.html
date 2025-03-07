@@ -215,7 +215,6 @@
                     <option value="chatanywhere">ChatAnyWhere源</option>
                     <option value="moonshot">MoonShot官方源</option>
                     <option value="lmuai">LMU AI源（暂不支持生图）</option>
-                    <option value="baiduyun">百度云官方源</option>
                 </select>
             </div>
             <div class="menu-item" id="deepThinkingSwitchContainer">
@@ -266,16 +265,6 @@
                     <option value="67c44d7e0723ed7977f8f534">Gemini 2 Flash</option>
                 </select>
             </div>
-            <div class="menu-item hidden" id="baiduYunModelSelectContainer">
-                <label for="baiduYunModelSelect">选择模型</label>
-                <select id="baiduYunModelSelect">
-                    <option value="ernie-4.0-turbo-8k">ernie-4.0-turbo-8k</option>
-                    <option value="ernie-3.5-128k">ernie-3.5-128k</option>
-                    <option value="ernie-speed-pro-128k">ernie-speed-pro-128k</option>
-                    <option value="ernie-lite-pro-128k">ernie-lite-pro-128k</option>
-                    <option value="deepseek-r1-distill-llama-8b">deepseek-r1-distill-llama-8b</option>
-                </select>
-            </div>
         </div>
     </div>
 
@@ -286,7 +275,6 @@
         const API_KEY_CHATANYWHERE_ENCODED = 'YzJzdGRWaFNZekpyV1VkdU0xZHpTMnd4VTNFMFFrcHViRU5KZGxaWVJHSlhSa0kzZEhKelZqZG9Zbkk0ZG14c09GbHg=';
         const API_KEY_MOONSHOT_ENCODED = 'YzJzdFRuZHZURlJYY0VkMGJ6ZHRPRzE1Y1RGemRrbFZTRUoxU1dWb00yMDJkRVJCZEVobGNGcDFNSGd6UVROM1J6Qm8=';
         const API_KEY_LMUAI_ENCODED = 'YzJzdE5HUTJlV2x2YzNkbU1uSjNlbTlyY21GaVltTmxlVGQx';
-        const API_KEY_BAIDUYUN_ENCODED = 'YzJzdEJjZS12My9BTFRBSy05S0l1WTNpUkFaVzJ3OU80Q0h0MUcvNTBlZGYwYmFiYTQ1ZjlkNzljNjhmOWY2NDUxZTk4M2NlODcwNWM1MA==';
 
         // 解密函数
         function decodeApiKey(apiKeyEncoded) {
@@ -303,14 +291,12 @@
         const API_KEY_MOONSHOT = decodeApiKey(API_KEY_MOONSHOT_ENCODED);
         // console.log(API_KEY_MOONSHOT)   
         const API_KEY_LMUAI = decodeApiKey(API_KEY_LMUAI_ENCODED);
-        const API_KEY_BAIDUYUN = decodeApiKey(API_KEY_BAIDUYUN_ENCODED);
 
         let isDeepThinkingEnabled = false; // 深度思考开关状态
         let isSiliconFlowSource = false; // 是否使用硅基流动源
         let isChatAnywhereSource = false; // 是否使用ChatAnyWhere源
         let isMoonShotSource = false; // 是否使用MoonShot官方源
         let isLmuaiSource = false; // 是否使用LMU AI源
-        let isBaiduYunSource = false; // 是否使用百度云官方源
         let selectedModel = 'deepseek-ai/DeepSeek-R1'; // 当前选择的模型
         let isCustomModel = false; // 是否选择自定义模型
         let tryDeepThinking = false; // 是否尝试深度思考
@@ -354,18 +340,16 @@
             isChatAnywhereSource = sourceSelect.value === 'chatanywhere';
             isMoonShotSource = sourceSelect.value === 'moonshot';
             isLmuaiSource = sourceSelect.value === 'lmuai';
-            isBaiduYunSource = sourceSelect.value === 'baiduyun';
 
             // 显示或隐藏深度思考开关和模型选择
-            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isLmuaiSource || isBaiduYunSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isLmuaiSource && !isBaiduYunSource);
+            document.getElementById('deepThinkingSwitchContainer').classList.toggle('hidden', isSiliconFlowSource || isChatAnywhereSource || isMoonShotSource || isLmuaiSource);
+            document.getElementById('modelSelectContainer').classList.toggle('hidden',!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && !isLmuaiSource);
             document.getElementById('customModelContainer').classList.toggle('hidden',!isSiliconFlowSource ||!isCustomModel);
             document.getElementById('chatAnywhereModelSelectContainer').classList.toggle('hidden',!isChatAnywhereSource);
             document.getElementById('moonshotModelSelectContainer').classList.toggle('hidden',!isMoonShotSource);
             document.getElementById('moonshotWebSearchContainer').classList.toggle('hidden',!isMoonShotSource);
             document.getElementById('lmuaiModelSelectContainer').classList.toggle('hidden', !isLmuaiSource);
-            document.getElementById('baiduYunModelSelectContainer').classList.toggle('hidden', !isBaiduYunSource);
-            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || isLmuaiSource || isBaiduYunSource || sourceSelect.value === 'official');
+            document.getElementById('modelSelectContainer').classList.toggle('hidden', isChatAnywhereSource || isMoonShotSource || isLmuaiSource || sourceSelect.value === 'official');
         }
 
         // 处理模型选择变化
@@ -455,30 +439,108 @@
                 userMessage = userMessage.replace(new RegExp(sensitiveWords.join('|'), 'g'), match => '*'.repeat(match.length));
             }
 
-            input.value = '';
+            input.value = userMessage;
             appendMessage(userMessage, true);
 
-            // 更新对话历史
+            // 更新对话历史 - 确保消息交替
             if (isContextEnabled) {
                 conversationHistory.push({ role: 'user', content: userMessage });
+            } else if (selectedModel === 'deepseek-reasoner' && conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'assistant') {
+                // 当使用深度思考时，即使上下文关闭也保留最后一条assistant消息
+                conversationHistory = [conversationHistory[conversationHistory.length - 1], { role: 'user', content: userMessage }];
             } else {
                 conversationHistory = [{ role: 'user', content: userMessage }];
             }
 
             try {
-                let apiUrl, apiKey, model, tools;
+                const apiUrl = isLmuaiSource ? 'https://ai.fulitimes.com/api/openapi/v1/chat/completions' : 
+                    isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : 
+                    isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : 
+                    isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 
+                    'https://api.deepseek.com/v1/chat/completions';
+                
+                const apiKey = isLmuaiSource ? `${API_KEY_LMUAI}-${document.getElementById('lmuaiModelSelect').value}` :
+                    isSiliconFlowSource ? API_KEY_SILICONFLOW : 
+                    isChatAnywhereSource ? API_KEY_CHATANYWHERE : 
+                    isMoonShotSource ? API_KEY_MOONSHOT : 
+                    API_KEY_OFFICIAL;
+                let model;
 
-                if (isBaiduYunSource) {
-                    apiUrl = 'https://qianfan.baidubce.com/v2/chat/completions';
-                    apiKey = API_KEY_BAIDUYUN;
-                    model = document.getElementById('baiduYunModelSelect').value;
-                    tools = [];
+                if (isSiliconFlowSource) {
+                    model = isCustomModel ? document.getElementById('customModelInput').value : selectedModel;
+                } else if (isChatAnywhereSource) {
+                    model = document.getElementById('chatAnywhereModelSelect').value;
+                } else if (isMoonShotSource) {
+                    model = document.getElementById('moonshotModelSelect').value;
                 } else {
-                    apiUrl = isSiliconFlowSource ? 'https://api.siliconflow.cn/v1/chat/completions' : isChatAnywhereSource ? 'https://api.chatanywhere.org/v1/chat/completions' : isMoonShotSource ? 'https://api.moonshot.cn/v1/chat/completions' : 'https://api.deepseek.com/v1/chat/completions';
-                    apiKey = isSiliconFlowSource ? API_KEY_SILICONFLOW : isChatAnywhereSource ? API_KEY_CHATANYWHERE : isMoonShotSource ? API_KEY_MOONSHOT : API_KEY_OFFICIAL;
-                    model = isSiliconFlowSource ? (isCustomModel ? document.getElementById('customModelInput').value : selectedModel) : isChatAnywhereSource ? document.getElementById('chatAnywhereModelSelect').value : isMoonShotSource ? document.getElementById('moonshotModelSelect').value : (isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat');
-                    tools = isMoonShotSource && isMoonshotWebSearchEnabled ? [{ "type": "builtin_function", "function": { "name": "$web_search" } }] : [];
+                    // DeepSeek官方源开启深度思考时使用 deepseek-reasoner 模型
+                    model = isDeepThinkingEnabled ? 'deepseek-reasoner' : 'deepseek-chat';
                 }
+
+                let tools = [];
+
+                if (isMoonShotSource && isMoonshotWebSearchEnabled) {
+                    tools.push({
+                        "type": "builtin_function",
+                        "function": {
+                            "name": "$web_search",
+                        },
+                    });
+                }
+
+                const requestBody = isLmuaiSource ? {
+                    chatId: "",
+                    stream: false,
+                    messages: [
+                        {
+                            role: 'user',
+                            content: userMessage
+                        }
+                    ]
+                } : {
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `（此段为系统提示词，请遵守，但并不代表用户回复、立场）
+                                    [提示词1]
+                                        因为我们的独家markdown渲染器支持，你可以使用特殊标记语法为文字添加颜色，格式为：
+                                        §颜色代码§需要变色的文字§clear§
+    
+                                        使用规范：
+                                        1. 颜色代码必须是6位十六进制（如#ff0000代表红色）
+                                        2. 必须以§clear§结束当前颜色作用域
+                                        3. 转义§符号需使用\\§
+                                        4. 支持嵌套使用，但需正确闭合
+    
+                                        示例：
+                                        §#00ff11§绿色文字§clear§  → 显示绿色文字
+                                        §#0000ff§蓝§clear§§#ff0000§红§clear§色§clear§  → 显示"蓝色"中"蓝"为蓝色，"色"为红色
+                                        遇到\\§特殊符号 → 显示为§
+    
+                                        注意事项：
+                                        • 颜色代码必须包含#号
+                                        • ※不要将标记语法用于代码块中
+                                        • 确保每个颜色（或切换颜色时）都用 §clear§ 正确闭合，否则将显示错误（示例：§#0000ff§蓝§clear§§#ff0000§红§clear§，嵌套也要遵守语法）
+                                        • 用户已经安装特殊markdown渲染器，可以正常显示彩色文本，不要担心
+                                        • 最重要：1※仅当用户需要时/markdown格式输出时使用，不要太过好奇
+                                                 2※不要尝试教用户此语法，因为此语法是我们独创，除我们的渲染器外都 不支持 此语法。
+                                                 3※在正常情况下，不要重复用户的话语，这可能引起用户们的愤怒。
+                                    [提示词2]
+                                        如果用户要求你生成图片，按照用户的提示，用你的想象力去生动描述这幅图片的样子（除非用户需要，否则生动描述出来的内容不要直接说），并转换成英文替换掉下面markdown显示图片的url的“占位符”中：
+                                        ![image](https://image.pollinations.ai/prompt/占位符?width=1024&height=1024&seed=100&model=flux&nologo=true) 
+                                    除此之外：
+                                    • ※请按照用户使用的语言来回复（如果用户使用的不是中文的话）。` 
+
+                        },
+                        ...conversationHistory
+                    ],
+                    temperature: 0.7,
+                    // 只在有工具时包含tools字段
+                    ...(tools.length > 0 && { tools: tools }),
+                    // 添加深度思考参数
+                    enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1') || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled)
+                };
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -486,38 +548,35 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`
                     },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        tools: tools,
-                        web_search: isBaiduYunSource ? { enable: false, enable_citation: false, enable_trace: false } : undefined,
-                        enable_reasoning: isSiliconFlowSource && (selectedModel.includes('R1') || tryDeepThinking) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled)
-                    })
+                    body: JSON.stringify(requestBody)
                 });
+
+                const data = await response.json();
+                console.log('API 响应:', data); // 调试信息，检查响应结构
 
                 if (!response.ok) {
                     throw new Error(`API 请求失败: ${response.statusText}`);
                 }
 
-                const data = await response.json();
-                console.log('API 响应:', data);
-
+                // 确保 data.choices 存在且有内容
                 const choices = data.choices && data.choices.length > 0 ? data.choices : [];
                 const aiResponse = choices[0]?.message?.content || '无法获取回复';
                 const reasoningContent = choices[0]?.message?.reasoning_content || null;
 
+                // 更新对话历史
                 if (isContextEnabled) {
                     conversationHistory.push({ role: 'assistant', content: aiResponse });
-                } //else if (model === 'deepseek-reasoner') {
-                //     // 保留最后两条消息（user和assistant）
-                //     conversationHistory = conversationHistory.slice(-1);
-                //     conversationHistory.push({ role: 'assistant', content: aiResponse });
-                // }
+                } else if (model === 'deepseek-reasoner') {
+                    // 保留最后两条消息（user和assistant）
+                    conversationHistory = conversationHistory.slice(-1);
+                    conversationHistory.push({ role: 'assistant', content: aiResponse });
+                }
 
+                // 判断是否显示深度思考内容
                 const showDeepThinking = (isSiliconFlowSource && (selectedModel.includes('R1') || tryDeepThinking)) || (!isSiliconFlowSource && !isChatAnywhereSource && !isMoonShotSource && isDeepThinkingEnabled);
                 appendMessage(aiResponse, false, showDeepThinking && reasoningContent ? reasoningContent : null);
 
+                // 调试信息
                 console.log('AI 回复:', { aiResponse, reasoningContent, showDeepThinking });
             } catch (error) {
                 appendMessage('服务器繁忙，请稍后再试。（您可尝试切换源）');
